@@ -11,6 +11,14 @@
 #include <unordered_map>
 #include <queue>
 using namespace std;
+
+/**
+ * Method to create a map for each employee's preferences.
+ * Makes working with it in the method for the algorithm itself possible because we want easy traversal.
+ * @param N Size of everything
+ * @param employee_preferences 2D vector for the employee preferences (declared in Main)
+ * @return A vector containing maps of each employee's preferences
+ */
 vector<unordered_map<int, int> > create_employee_map(int N, vector<vector<int> > &employee_preferences)
 {
     vector<unordered_map<int, int> > employee_rankings(N);
@@ -23,10 +31,20 @@ vector<unordered_map<int, int> > create_employee_map(int N, vector<vector<int> >
     }
     return employee_rankings;
 }
+
+/**
+ * Method for the Gale-Shapley algorithm.
+ * Referenced {@link https://www.geeksforgeeks.org/stable-marriage-problem/} for understanding the algorithm itself.
+ * I used one ChatGPT prompt to debug one line. I was calling the wrong data structure in the while loop.
+ * @param N Size of everything
+ * @param employee_rankings Vector with maps for each employee's rankings of employers, created in the method above
+ * @param employer_preferences 2D vector for each employer's preferences of employees, declared in Main
+ * @return Vector containing each stable match (employer -> employee)
+ */
 vector<int> matching_algorithm(int N, vector<unordered_map<int, int> > &employee_rankings, vector<vector<int> > &employer_preferences)
 {
     vector<int> matches(N, -1);     // Vector for matches, empty w/ no matches @ start
-    queue<int> unmatched_employers;
+    queue<int> unmatched_employers;     // Queue containing each employer, easier than working with arrays
     for (int i = 0; i < N; i++)
         unmatched_employers.push(i);
 
@@ -36,7 +54,7 @@ vector<int> matching_algorithm(int N, vector<unordered_map<int, int> > &employee
         int employer = unmatched_employers.front();
         unmatched_employers.pop();
 
-        int employee = employer_preferences[employer][proposals[employer]] - 1;
+        int employee = employer_preferences[employer][proposals[employer]] - 1;     // The line debugged with ChatGPT.
         proposals[employer]++;
         // If the employee is free, matches
         if (matches[employee] == -1)
@@ -63,13 +81,19 @@ vector<int> matching_algorithm(int N, vector<unordered_map<int, int> > &employee
     }
     return matches;
 }
+
+/**
+ * Helper method for printing in a nice format.
+ * @param matches Vector containing the matches. Returned in the algorithm method
+ */
 void printMatching(vector<int> &matches)
 {
-    cout << "Matching (Employer -> Employee): " << endl;
+    cout << "Matches (Employer -> Employee): " << endl;
     for (int i = 0; i < matches.size(); i++)
         cout << "Employer " << i << " -> Employee " << matches[i] << endl;
     cout << endl;
 }
+
 int main()
 {
     const int N = 3;
